@@ -56,6 +56,7 @@ function custom_login_failed( $username ) {
     $entry->event->useragent = $_SERVER['HTTP_USER_AGENT'];
     $entry->event->username = $username;
     $entry->event->password = $password;
+    $entry->event->referrer = $_SERVER['HTTP_REFERER'];
     
     $json = json_encode($entry);
     $ch = curl_init($url);
