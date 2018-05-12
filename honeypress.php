@@ -33,29 +33,37 @@ function custom_login_failed( $username ) {
     $password = $_POST["pwd"];
     # publish results to splunk
     global $wpdb;
+    $tablename = $wpdb->prefix . "honeypress"; 
     $token = $wpdb->get_row("Select value from $tablename where name = 'splunk_token'")->value ;
     $url = $wpdb->get_row("Select value from $tablename where name = 'splunk_url'")->value ;
 
     $entry = new \stdClass();
-    $entry["index"] = "";
-    $entry["source"] = "";
-    $entry["sourcetype"] = "";
-    $entry["host"] = "";
-    $entry["event"] = "foo";
-
+    $entry->time = time();
+    $entry->index = "main";
+    $entry->source = "honeypress";
+    $entry->sourcetype = "";
+    $entry->host = "ume";
+    $entry->event = "foo";
+    
     $json = json_encode($entry);
-    // use key 'http' even if you send the request to https://...
-    $options = array(
-        'http' => array(
-            'header'  => "Content-type: application/json\r\nUser-Agent: Honeypress\r\nAuthorization: foo",
-            'method'  => 'POST',
-            'content' => http_build_query($json)
-        )
-    );
-    $context  = stream_context_create($options);
-    $result = file_get_contents($url, false, $context);
-    if ($result === FALSE) { /* Handle error */ }
-
+    $ch = curl_init($url);
+ 
+    
+    //Tell cURL that we want to send a POST request.
+    curl_setopt($ch, CURLOPT_POST, 1);
+    
+    //Attach our encoded JSON string to the POST fields.
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    //Set the content type to application/json
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        "Authorization: Splunk $token"
+    )); 
+    
+    //Execute the request
+    $result = curl_exec($ch);
+    var_dump(curl_error($ch));
     var_dump($result);
 }
 add_action( 'wp_login_failed', 'custom_login_failed' );
