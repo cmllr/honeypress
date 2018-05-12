@@ -41,9 +41,21 @@ function custom_login_failed( $username ) {
     $entry->time = time();
     $entry->index = "main";
     $entry->source = "honeypress";
-    $entry->sourcetype = "";
+    $entry->sourcetype = "json";
     $entry->host = "ume";
-    $entry->event = "foo";
+    $entry->event = new \stdClass();
+    $ip = "";
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    $entry->event->source_ip = $ip;
+    $entry->event->useragent = $_SERVER['HTTP_USER_AGENT'];
+    $entry->event->username = $username;
+    $entry->event->password = $password;
     
     $json = json_encode($entry);
     $ch = curl_init($url);
@@ -60,11 +72,9 @@ function custom_login_failed( $username ) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         "Authorization: Splunk $token"
     )); 
-    
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     //Execute the request
     $result = curl_exec($ch);
-    var_dump(curl_error($ch));
-    var_dump($result);
 }
 add_action( 'wp_login_failed', 'custom_login_failed' );
 
