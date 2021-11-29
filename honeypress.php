@@ -1,73 +1,86 @@
 <?php
-define("HONEYPOT_NAME", "Honeypress");
-define("HONEYPOT_VERSION", "0.1");
-
-
-
 /*
 Plugin Name:  Honeypress
 Plugin URI:   https://github.com/cmllr/honeypress.git
-Description:  Authorization honeypot
-Version:      0.1
-Author:       Roasting Malware
-Author URI:   https://github.com/roastingmalware
-License:      MIT
+Description:  Low interaction honeypot for WordPress
+Version:      2
+Author:       Christoph Müller
+Author URI:   https://github.com/cmllr/honeypress.git
+License:      Apache 2.0
 */
 
-function honeypot_install()
+/**
+ * Pulls a needle out of a haystack
+ * 
+ * @returns the value or null
+ */
+function get_value($needle, $haystack)
 {
-    global $wpdb;
-
-    $charset_collate = $wpdb->get_charset_collate();
-    $tablename = $wpdb->prefix . "honeypress";
-    $sql = "CREATE TABLE $tablename (
-      id mediumint(9) NOT NULL AUTO_INCREMENT,
-      name text NOT NULL,
-      value text NOT NULL,
-      PRIMARY KEY  (id)
-    ) $charset_collate;";
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
-}
-function custom_login_failed($username)
-{
-    $referrer = $_SERVER['HTTP_REFERER'];
-    $password = $_POST["pwd"];
-    # publish results to splunk
-    var_dump($_POST);
-}
-add_action('wp_login_failed', 'custom_login_failed');
-
-add_action('admin_menu', 'my_plugin_menu');
-register_activation_hook(__FILE__, 'honeypot_install');
-
-/** Step 1. */
-function my_plugin_menu()
-{
-    add_options_page(HONEYPOT_NAME, HONEYPOT_NAME, 'manage_options', HONEYPOT_NAME, 'my_plugin_options');
-}
-
-/** Step 3. */
-function my_plugin_options()
-{
-    if (!current_user_can('manage_options')) {
-        wp_die(__('You do not have sufficient permissions to access this page.'));
+    $keys = array_keys($haystack);
+    if (in_array($needle, $keys)) {
+        return $haystack[$needle];
     }
-    global $wpdb;
-    $tablename = $wpdb->prefix . "honeypress";
-    if (isset($_POST["splunk_url"]) && isset($_POST["splunk_token"])) {
-        $wpdb->delete($tablename, array('name' => "splunk_url"));
-        $wpdb->delete($tablename, array('name' => "splunk_token"));
-        $wpdb->insert($tablename, array(
-            'name' => 'splunk_url',
-            'value' => $_POST["splunk_url"],
-        ));
-        $wpdb->insert($tablename, array(
-            'name' => 'splunk_token',
-            'value' => $_POST["splunk_token"],
-        ));
-    }
-    $token = $wpdb->get_row("Select value from $tablename where name = 'splunk_token'")->value;
-    $url = $wpdb->get_row("Select value from $tablename where name = 'splunk_url'")->value;
-    include plugin_dir_path(__FILE__) . "options.php";
+    return null;
 }
+
+/**
+ * Return the client IP
+ * 
+ * @return the client ip
+ */
+function get_ip()
+{
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
+
+/**
+ * Get an generic info about the request
+ * 
+ * @returns get, post, target, userAgent, referrer, ip
+ */
+function get_request_env()
+{
+    $result = array(
+        "get" => $_GET,
+        "post" => $_POST,
+        "target" => get_value("REQUEST_URI", $_SERVER),
+        "userAgent" => get_value("HTTP_USER_AGENT", $_SERVER),
+        "referrer" => get_value("HTTP_REFERER", $_SERVER),
+        "ip" => get_ip()
+    );
+    return $result;
+}
+
+/**
+ * Hook triggered by wrong logins
+ * 
+ */
+function login_trigger($username)
+{
+    $data = get_request_env();
+    $data["credentials"] = array(
+        "user" => $username,
+        "password" => $_POST["pwd"],
+        "stayLoggedIn" => in_array("rememberme", array_keys($_POST))
+    );
+    var_dump($data);
+}
+add_action('wp_login_failed', 'login_trigger');
+
+/**
+ * Triggers if the page shows an 404 error
+ */
+function notfound_trigger()
+{
+    if (is_404()) {
+        var_dump(get_request_env());
+    }
+}
+add_action('template_redirect', 'notfound_trigger');
