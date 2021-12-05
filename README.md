@@ -2,6 +2,8 @@
 
 Honeypress is a high interaction honeypot operating on top of a real WordPress instance.
 
+🛑 **Don't use this on a production environment** 🛑 
+
 ## What is that?
 
 The honeypot uses an actual WordPress instance and injects users on `wp_login_failed` into the instance.
@@ -73,4 +75,4 @@ In case you give the default user role permission to access the plugin list, Hon
 
 ## License
 
-Apache 2.0
+GPLv3
