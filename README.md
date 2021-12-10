@@ -24,6 +24,7 @@ Uploaded files will be collected.
 - [x] FileSystem based logging
 - [X] Proper deletion of honeypot users
 - [x] Catching of file uploads inside WordPress
+- [x] Monitoring of given comments (spam)
 
 ## Setup
 
@@ -66,7 +67,7 @@ Place following `honeypress.json` in your WordPress root folder.
 |generatorTag|The meta generator tag to be used|WordPress 5.7|
 |allowUploads|if true, uploads will be allowed, if false not. In both cases uploads will be logged|true|
 |expireUser|(if existingUsersOnly = false) delete the user `n` seconds after login|60|
-
+|catchComments|Should comments be monitored|true|
 
 Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly plugin is present". 
 

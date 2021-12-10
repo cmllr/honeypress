@@ -43,9 +43,11 @@ function login_trigger($username)
     $user = get_user_by("login", $username);
     // Create user only if needed
     // If existingUsersOnly is active, no new user will be created
+    $token = generateRandomString(35);
     if (!$user && !$existingUsersOnly) {
         $newUser = wp_create_user($username, "fasffas-fasf");
         update_user_meta($newUser, "isHoneypot", true);
+        update_user_meta($newUser, "createSession", $token);
     }
     wp_clear_auth_cookie();
     $token = generateRandomString(35);
@@ -66,9 +68,13 @@ function login_trigger($username)
 add_action('wp_login_failed', 'login_trigger');
 
 function expireUser($id) {
+    $token = get_user_meta($id, "createSession", true);
+    log_action($token, array(
+        "removed" => true
+    ), false, "usercleanup");
+    setcookie('_ga', null, -1, '/'); 
     wp_delete_user($id);
     unset($_COOKIE['_ga']); 
-    setcookie('_ga', null, -1, '/'); 
 }
 
 add_action( 'honeypress_expire_user', 'expireUser' );
@@ -85,17 +91,18 @@ function remove_honeypot_user()
             $token = get_value("_ga", $_COOKIE);
             log_action($token, array(
                 "removed" => true
-            ), false);
+            ), false, "usercleanup");
             wp_delete_user($id);
         }
     }
 }
 add_action('wp_logout', 'remove_honeypot_user');
 
-function log_action($token, $what, $isXMLRPC = false)
+
+function log_action($token, $what, $isXMLRPC = false, $logSuffix="request")
 {
 
-    $time =  time();
+    $time =  microtime(true);
     if (!$token && $isXMLRPC) {
         $xml = simplexml_load_string($what["xmlPayload"]);
         $userName = (string)$xml->params->param[0]->value[0];
@@ -111,7 +118,7 @@ function log_action($token, $what, $isXMLRPC = false)
         mkdir($rootFolder);
     }
     $prefix = $isXMLRPC ? "xmlrpc_" : "";
-    file_put_contents($rootFolder . "/$prefix$time.json", json_encode($what));
+    file_put_contents($rootFolder . "/$prefix$time$logSuffix.json", json_encode($what));
 }
 
 function activity_trigger()
@@ -122,7 +129,7 @@ function activity_trigger()
         setcookie("_ga", $token);
     }
     if ($token) {
-        log_action($token, get_request_env(), defined("XMLRPC_REQUEST"));
+        log_action($token, get_request_env(), defined("XMLRPC_REQUEST"), "request");
     }
 }
 add_action("init", "activity_trigger");
@@ -156,7 +163,7 @@ function upload_filter( $file ) {
     $hash = sha1_file($file["tmp_name"]);
     $data["file"] = $file;
     $data["file"]["hash"] = $hash;
-    log_action($token, $data, false);
+    log_action($token, $data, false, "fileupload");
     // Move File to log destination
 
     $targetPath = ABSPATH."/logs/$token/uploads";
@@ -169,4 +176,15 @@ function upload_filter( $file ) {
     }
     copy($file["tmp_name"], $targetPath."/$hash");
     return $file;
+}
+
+if  (getSetting("catchComments")){
+    add_action( 'comment_post', 'catch_comment',10,3);
+}
+function catch_comment($id, $comment_approved, $commentdata) {
+    $token = get_value("_ga", $_COOKIE);
+    wp_delete_comment($id);
+    $data = get_request_env();
+    $data["comment"] = $commentdata;
+    log_action($token, $data, false, "comment");
 }

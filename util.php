@@ -14,6 +14,9 @@ function create_log_folder($id, $credentials)
     mkdir($rootFolder . "/" . $id);
   }
   file_put_contents($rootFolder . "/" . $id . "/credentials.json", json_encode($credentials));
+  $data = get_request_env();
+  $data["credentials"] = $credentials;
+  log_action($id, $data, false, "useradd");
 }
 
 function generateRandomString($length = 10)
@@ -66,7 +69,8 @@ function getSetting($key)
     "deleteAfterLogin" =>  true,
     "generatorTag" =>  "WordPress 5.7",
     "allowUploads" => true,
-    "expireUser" => 60
+    "expireUser" => 60,
+    "catchComments" => true
   );
 
   $configPath = ABSPATH . "/honeypress.json";
