@@ -10,6 +10,8 @@ The goal is to monitor activities on the instance. These activities can be attem
 
 The HoneyPot can utilize defined users and/ or create users on the fly (with a limited lifespan) and monitors the acitvity as JSON file. Activities will be logged on the logs/ directory inside the WordPress directory.
 
+🛑 **This project is a playground. Use with caution :)** 🛑 
+
 ## Features
 
 - [x] Logging of failed login interactions
@@ -24,21 +26,7 @@ The HoneyPot can utilize defined users and/ or create users on the fly (with a l
 
 ## Setup
 
-### .htaccess
-
-Add following code to the .htaccess file:
-
-```
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /wordpress/index.php [L]
-
-<Files "honeypress.json">  
-  Redirect 404
-</Files>
-
-
-```
+Make sure not found files are being redirected to the index.php of the WordPress instance (allowing the plugin to catch these requests).
 
 ### Setup plugin
 
@@ -78,8 +66,8 @@ In case you give the default user role permission to access the plugin list, Hon
 - Use containers and/ or virtual machines
 - Apply a regular reset of HoneyPress instances
 - 🛑 **Don't use this on a production environment** 🛑 
-- Make the wp-contents/ directory readonly
-- Prevent access throught the webserver towards logs/ and honeypress.json (redirect it to 404)
+- Make the `wp-contents/` directory readonly
+- Prevent access throught the webserver towards `logs/` and `honeypress.json` (redirect it to 404)
 
 ## License
 
