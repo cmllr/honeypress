@@ -56,7 +56,8 @@ Place following `honeypress.json` in your WordPress root folder.
   ],
   "generatorTag": "WordPress 5.721",
   "allowUploads": true,
-  "expireUser": 10
+  "expireUser": 10,
+  "catchComments": true
 }
 ```
 |Setting|Description|Default|
