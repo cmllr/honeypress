@@ -1,18 +1,14 @@
-# Honeypress
+# HoneyPress
 
-Honeypress is a high interaction honeypot operating on top of a real WordPress instance.
+```
+  /_)
+(8_))}-  High interaction HoneyPot for WordPress.
+  \_)   
+```
 
-🛑 **Don't use this on a production environment** 🛑 
+The goal is to monitor activities on the instance. These activities can be attempted logins, comment spam or in general requests towards the instance to drop scripts.
 
-## What is that?
-
-The honeypot uses an actual WordPress instance and injects users on `wp_login_failed` into the instance.
-
-The attacker can freely navigate in WordPress according to the default WP role.
-
-After logout, the user will be deleted if not a prepared user was utilized.
-
-Uploaded files will be collected.
+The HoneyPot can utilize defined users and/ or create users on the fly (with a limited lifespan) and monitors the acitvity as JSON file. Activities will be logged on the logs/ directory inside the WordPress directory.
 
 ## Features
 
@@ -40,6 +36,8 @@ RewriteRule . /wordpress/index.php [L]
 <Files "honeypress.json">  
   Redirect 404
 </Files>
+
+
 ```
 
 ### Setup plugin
@@ -74,6 +72,14 @@ Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly plugin 
 
 In case you give the default user role permission to access the plugin list, HoneyPress will try to mask itself behind Hello Dolly's description.
 
+## Recommendations
+
+- Use an proxy for outgoing connections (so you can monitor installed droppers)
+- Use containers and/ or virtual machines
+- Apply a regular reset of HoneyPress instances
+- 🛑 **Don't use this on a production environment** 🛑 
+- Make the wp-contents/ directory readonly
+- Prevent access throught the webserver towards logs/ and honeypress.json (redirect it to 404)
 
 ## License
 
