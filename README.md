@@ -69,13 +69,13 @@ The honeypot logs as following:
 logs/global.log # all activity
 
 logs/<token>/credentials.log (if the user logged in)
-logs/<token>/<timestamp><request|dashboard|usercleanup|useradd>.log (Activity)
+logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logout|comment>.log (Activity)
 ```
 
 `global.log` uses following structure:
 
 ```
-[IP] [token or "No token"] [request|dashboard|usercleanup|useradd] logmessage
+[IP] [token or "No token"] [request|dashboard|usercleanup|useradd|usercleanup_logout|comment] logmessage
 ```
 
 ## Recommendations
