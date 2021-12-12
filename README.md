@@ -32,13 +32,12 @@ HoneyPress can monitor following actions
 - `request` - A request was completed
 - `dashboard` - A user navigated in the admin dashboad
 - `usercleanup` - A user was removed (e. g. due session expire)
-- `useradd` - A user was created 
-- `usercleanup_logout`- A user was removed due to logout
+- `useradd` - A user was created by HoneyPress
+- `usercleanup_logout`- A user was removed due to logout by HoneyPress
 - `comment` - A comment was done
 - `fileupload` - A file was uploaded out of the WordPress backend
 - `filedropnew` - A file was dropped somewhere in the WordPress installation 1) 2)
 - `filedropdelete` - A file was removed somewhere in the WordPress installation 1) 2)
-
 
 ### Remarks 
 1) if a file was changed, a `filedropdelete` and `filedropnew` action will be caused.
