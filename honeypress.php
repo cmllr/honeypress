@@ -72,13 +72,15 @@ add_action('wp_login_failed', 'login_trigger');
 function expireUser($id) {
     $token = get_user_meta($id, "createSession", true);
     $user = get_user_by("ID", $id);
-    $userName = $user->user_login;
-    log_action($token, array(
-        "removed" => true
-    ), false, "Removed user $id ($userName)", "usercleanup");
-    setcookie('_ga', null, -1, '/'); 
-    wp_delete_user($id);
-    unset($_COOKIE['_ga']); 
+    if ($user){
+        $userName = $user->user_login;
+        log_action($token, array(
+            "removed" => true
+        ), false, "Removed user $id ($userName)", "usercleanup");
+        setcookie('_ga', null, -1, '/'); 
+        wp_delete_user($id);
+        unset($_COOKIE['_ga']); 
+    }
 }
 
 add_action( 'honeypress_expire_user', 'expireUser' );
