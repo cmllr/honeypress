@@ -36,11 +36,13 @@ HoneyPress can monitor following actions
 - `usercleanup_logout`- A user was removed due to logout
 - `comment` - A comment was done
 - `fileupload` - A file was uploaded out of the WordPress backend
-- `filedropnew` - A file was dropped somewhere in the WordPress installation* **
-- `filedropdelete` - A file was removed somewhere in the WordPress installation* **
+- `filedropnew` - A file was dropped somewhere in the WordPress installation 1) 2)
+- `filedropdelete` - A file was removed somewhere in the WordPress installation 1) 2)
 
-*if a file was changed, a `filedropdelete` and `filedropnew` action will be caused.
-*not for wp-content/uploads
+
+### Remarks 
+1) if a file was changed, a `filedropdelete` and `filedropnew` action will be caused.
+2) not for wp-content/uploads
 
 ## Setup
 
