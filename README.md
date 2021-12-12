@@ -31,7 +31,7 @@ HoneyPress can monitor following actions
 
 - `request` - A request was completed
 - `dashboard` - A user navigated in the admin dashboad
-- `usercleanup` - A user was removed (e. g. due session expire)
+- `usercleanup` - A user was removed (e. g. due session expire) by HoneyPress
 - `useradd` - A user was created by HoneyPress
 - `usercleanup_logout`- A user was removed due to logout by HoneyPress
 - `comment` - A comment was done
@@ -97,6 +97,12 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 ```
 [IP] [token or "No token"] [request|dashboard|usercleanup|useradd|usercleanup_logout|fileupload|comment|filedropnew|filedropdelete] logmessage
 ```
+
+## Limitations
+
+This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.
+
+It is not the goal to monitor everything possible, it is more an base monitoring what is going on with some crawlers or botnets.
 
 ## Recommendations
 
