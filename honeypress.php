@@ -28,6 +28,53 @@ License:      Apache 2.0
 require_once ABSPATH . "/wp-content/plugins/honeypress/util.php";
 require_once(ABSPATH . 'wp-admin/includes/user.php');
 
+
+$preState = ABSPATH."/logs/pre.json";
+
+if (!is_file($preState)){
+    $content = getDirContents(ABSPATH);
+    file_put_contents($preState, json_encode($content));
+} 
+
+$preStateContent = json_decode(file_get_contents($preState));
+$nowStateContent = getDirContents(ABSPATH);
+$change = false;
+
+/* check if unknown hashs are now present */
+foreach($nowStateContent as $key => $file){
+    $token = get_value("_ga", $_COOKIE);
+    if (!$token){
+        $token = generateRandomString(35);
+        setcookie("_ga", $token);
+    }
+    if (!property_exists($preStateContent, $key)){
+        log_action($token, $file, false, "New file $file", "filedropnew");
+        $change = true;
+    }
+}
+
+foreach($preStateContent as $key => $file){
+    $token = get_value("_ga", $_COOKIE);
+    if (!$token){
+        $token = generateRandomString(35);
+        setcookie("_ga", $token);
+    }
+    if (!array_key_exists($key, $nowStateContent)){
+        log_action($token, $file, false, "Removed file $file", "filedropdelete");
+        $change = true;
+    }
+}
+
+
+
+if ($change){
+    $preStateContent = $nowStateContent;
+    file_put_contents($preState, json_encode($preStateContent));
+}
+
+
+
+
 /**
  * Hook triggered by wrong logins
  * 

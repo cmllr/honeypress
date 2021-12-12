@@ -25,6 +25,23 @@ The Honeypot can utilize defined users and/ or create users on the fly (with a l
 - [x] Monitoring of given comments (spam)
 - [x] Log activity inside the WP dashboard
 
+## Activities
+
+HoneyPress can monitor following actions
+
+- `request` - A request was completed
+- `dashboard` - A user navigated in the admin dashboad
+- `usercleanup` - A user was removed (e. g. due session expire)
+- `useradd` - A user was created 
+- `usercleanup_logout`- A user was removed due to logout
+- `comment` - A comment was done
+- `fileupload` - A file was uploaded out of the WordPress backend
+- `filedropnew` - A file was dropped somewhere in the WordPress installation* **
+- `filedropdelete` - A file was removed somewhere in the WordPress installation* **
+
+*if a file was changed, a `filedropdelete` and `filedropnew` action will be caused.
+*not for wp-content/uploads
+
 ## Setup
 
 Make sure not found files are being redirected to the index.php of the WordPress instance (allowing the plugin to catch these requests).
@@ -44,7 +61,8 @@ Place following `honeypress.json` in your WordPress root folder.
   "generatorTag": "WordPress 5.721",
   "allowUploads": true,
   "expireUser": 10,
-  "catchComments": true
+  "catchComments": true,
+  "watchFiles": true
 }
 ```
 |Setting|Description|Default|
@@ -56,6 +74,7 @@ Place following `honeypress.json` in your WordPress root folder.
 |allowUploads|if true, uploads will be allowed, if false not. In both cases uploads will be logged|true|
 |expireUser|(if existingUsersOnly = false) delete the user `n` seconds after login|60|
 |catchComments|Should comments be monitored|true|
+|watchFiles|Check the files for changes (slow operation)|true|
 
 Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly plugin is present". 
 
@@ -69,13 +88,13 @@ The honeypot logs as following:
 logs/global.log # all activity
 
 logs/<token>/credentials.log (if the user logged in)
-logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logout|comment>.log (Activity)
+logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logout|fileupload|comment|filedropnew|filedropdelete>.log (Activity)
 ```
 
 `global.log` uses following structure:
 
 ```
-[IP] [token or "No token"] [request|dashboard|usercleanup|useradd|usercleanup_logout|comment] logmessage
+[IP] [token or "No token"] [request|dashboard|usercleanup|useradd|usercleanup_logout|fileupload|comment|filedropnew|filedropdelete] logmessage
 ```
 
 ## Recommendations

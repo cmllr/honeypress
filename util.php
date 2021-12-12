@@ -87,7 +87,8 @@ function getSetting($key)
     "generatorTag" =>  "WordPress 5.7",
     "allowUploads" => true,
     "expireUser" => 60,
-    "catchComments" => true
+    "catchComments" => true,
+    "watchFiles" => true
   );
 
   $configPath = ABSPATH . "/honeypress.json";
@@ -139,4 +140,27 @@ function get_ip()
     $ip = $_SERVER['REMOTE_ADDR'];
   }
   return $ip;
+}
+
+function get_hash($filename){
+  return hash_file("CRC32", $filename, false);
+}
+/* https://stackoverflow.com/questions/24783862/list-all-the-files-and-folders-in-a-directory-with-php-recursive-function */
+function getDirContents($dir, &$results = array()) {
+  $files = scandir($dir);
+
+  foreach ($files as $key => $value) {
+      $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
+      if (!is_dir($path)) {
+        if (strpos($path, "honeypress") === false && strpos($path, "uploads") == false){
+          $results[get_hash($path)] = $path;
+        }
+      } else if ($value != "." && $value != "..") {
+        if (strpos($path, "logs") === false){
+          getDirContents($path, $results);
+        }
+      }
+  }
+
+  return $results;
 }
