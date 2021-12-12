@@ -16,7 +16,8 @@ function create_log_folder($id, $credentials)
   file_put_contents($rootFolder . "/" . $id . "/credentials.json", json_encode($credentials));
   $data = get_request_env();
   $data["credentials"] = $credentials;
-  log_action($id, $data, false, "useradd");
+  $userName = $credentials["credentials"]["user"];
+  log_action($id, $data, false, "Created user $userName", "useradd");
 }
 
 function generateRandomString($length = 10)

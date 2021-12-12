@@ -2,13 +2,13 @@
 
 ```
   /_)
-(8_))}-  High interaction HoneyPot for WordPress.
+(8_))}-  High interaction Honeypot for WordPress.
   \_)   
 ```
 
 The goal is to monitor activities on the instance. These activities can be attempted logins, comment spam or in general requests towards the instance to drop scripts.
 
-The HoneyPot can utilize defined users and/ or create users on the fly (with a limited lifespan) and monitors the acitvity as JSON file. Activities will be logged on the logs/ directory inside the WordPress directory.
+The Honeypot can utilize defined users and/ or create users on the fly (with a limited lifespan) and monitors the acitvity as JSON file. Activities will be logged on the logs/ directory inside the WordPress directory.
 
 🛑 **This project is a playground. Use with caution :)** 🛑 
 
@@ -23,6 +23,7 @@ The HoneyPot can utilize defined users and/ or create users on the fly (with a l
 - [X] Proper deletion of honeypot users
 - [x] Catching of file uploads inside WordPress
 - [x] Monitoring of given comments (spam)
+- [x] Log activity inside the WP dashboard
 
 ## Setup
 
@@ -59,6 +60,23 @@ Place following `honeypress.json` in your WordPress root folder.
 Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly plugin is present". 
 
 In case you give the default user role permission to access the plugin list, HoneyPress will try to mask itself behind Hello Dolly's description.
+
+# Logging
+
+The honeypot logs as following:
+
+```
+logs/global.log # all activity
+
+logs/<token>/credentials.log (if the user logged in)
+logs/<token>/<timestamp><request|dashboard|usercleanup|useradd>.log (Activity)
+```
+
+`global.log` uses following structure:
+
+```
+[IP] [token or "No token"] [request|dashboard|usercleanup|useradd] logmessage
+```
 
 ## Recommendations
 

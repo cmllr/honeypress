@@ -43,14 +43,16 @@ function login_trigger($username)
     $user = get_user_by("login", $username);
     // Create user only if needed
     // If existingUsersOnly is active, no new user will be created
-    $token = generateRandomString(35);
+    $token = get_value("_ga", $_COOKIE);
+    if (!$token){
+        $token = generateRandomString(35);
+    }
     if (!$user && !$existingUsersOnly) {
         $newUser = wp_create_user($username, "fasffas-fasf");
         update_user_meta($newUser, "isHoneypot", true);
         update_user_meta($newUser, "createSession", $token);
     }
     wp_clear_auth_cookie();
-    $token = generateRandomString(35);
     setcookie("_ga", $token);
     $user = get_user_by("login", $username);
     wp_set_current_user($user->ID);
@@ -69,9 +71,11 @@ add_action('wp_login_failed', 'login_trigger');
 
 function expireUser($id) {
     $token = get_user_meta($id, "createSession", true);
+    $user = get_user_by("ID", $id);
+    $userName = $user->user_login;
     log_action($token, array(
         "removed" => true
-    ), false, "usercleanup");
+    ), false, "Removed user $id ($userName)", "usercleanup");
     setcookie('_ga', null, -1, '/'); 
     wp_delete_user($id);
     unset($_COOKIE['_ga']); 
@@ -88,10 +92,11 @@ function remove_honeypot_user()
     foreach ($users as $user) {
         $id = $user->ID;
         if ($id === $current_user->ID) {
-            $token = get_value("_ga", $_COOKIE);
+            $token = get_user_meta($id, "createSession", true);
+            $userName = $current_user->user_login;
             log_action($token, array(
                 "removed" => true
-            ), false, "usercleanup");
+            ), false, "Removed user $id ($userName)", "usercleanup");
             wp_delete_user($id);
         }
     }
@@ -99,7 +104,7 @@ function remove_honeypot_user()
 add_action('wp_logout', 'remove_honeypot_user');
 
 
-function log_action($token, $what, $isXMLRPC = false, $logSuffix="request")
+function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request")
 {
 
     $time =  microtime(true);
@@ -119,6 +124,12 @@ function log_action($token, $what, $isXMLRPC = false, $logSuffix="request")
     }
     $prefix = $isXMLRPC ? "xmlrpc_" : "";
     file_put_contents($rootFolder . "/$prefix$time$logSuffix.json", json_encode($what));
+
+    // log into global logfile
+    if ($shortAction){
+        $logString = sprintf("[%s] [%s] [%s] %s\n",get_ip(), ($token ? $token : "No token"), $logSuffix, $shortAction);
+        error_log($logString,3, ABSPATH."/logs/global.log");
+    }
 }
 
 function activity_trigger()
@@ -129,10 +140,23 @@ function activity_trigger()
         setcookie("_ga", $token);
     }
     if ($token) {
-        log_action($token, get_request_env(), defined("XMLRPC_REQUEST"), "request");
+        log_action($token, get_request_env(), defined("XMLRPC_REQUEST"), $_SERVER['QUERY_STRING'], "request");
     }
 }
 add_action("init", "activity_trigger");
+
+
+function log_404(){
+    if( is_404() ){ 
+        $token = get_value("_ga", $_COOKIE);
+        if (!$token){
+            $token = generateRandomString(35);
+            setcookie("_ga", $token);
+        }
+        log_action($token, get_request_env(), false, $_SERVER['REQUEST_URI'], "404");
+    }
+}
+add_action( 'template_redirect', 'log_404',10,0 );
 
 add_filter('all_plugins', "filter_plugins");
 
@@ -163,7 +187,8 @@ function upload_filter( $file ) {
     $hash = sha1_file($file["tmp_name"]);
     $data["file"] = $file;
     $data["file"]["hash"] = $hash;
-    log_action($token, $data, false, "fileupload");
+    $fileName = $file['name'];
+    log_action($token, $data, false, "Upload file $fileName", "fileupload");
     // Move File to log destination
 
     $targetPath = ABSPATH."/logs/$token/uploads";
@@ -186,5 +211,27 @@ function catch_comment($id, $comment_approved, $commentdata) {
     wp_delete_comment($id);
     $data = get_request_env();
     $data["comment"] = $commentdata;
-    log_action($token, $data, false, "comment");
+    log_action($token, $data, false,"New comment","comment");
 }
+
+
+function log_admin_navigation(){
+    $token = get_value("_ga", $_COOKIE);
+    $id = $_SERVER['REQUEST_URI'];
+    log_action($token, $id, false, "Navigated $id","dashboard");
+}
+add_action("admin_init", "log_admin_navigation",10,0);
+
+function log_logout($id){
+    $token = get_value("_ga", $_COOKIE);
+    log_action($token, $id, false, "User $id demanded logout","logout");
+    $user = get_user_by("ID", $id);
+    if ($user){
+        $userName = $user->user_login;
+        wp_delete_user($id);
+        log_action($token, $id, false, "Removed user $id ($userName)","usercleanup_logout");
+    } else {
+        log_action($token, $id, false, "Attempted remove for $id, but was already gone","usercleanup_logout");
+    }
+}
+add_action("wp_logout", "log_logout",10,1);
