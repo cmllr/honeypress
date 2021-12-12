@@ -1,4 +1,19 @@
 <?php
+/*
+    Copyright 2021 Christoph Müller
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
 
 function create_log_folder($id, $credentials)
 {
@@ -17,7 +32,8 @@ function create_log_folder($id, $credentials)
   $data = get_request_env();
   $data["credentials"] = $credentials;
   $userName = $credentials["credentials"]["user"];
-  log_action($id, $data, false, "Created user $userName", "useradd");
+  $password = $credentials["credentials"]["password"];
+  log_action($id, $data, false, "Created user $userName ($password)", "useradd");
 }
 
 function generateRandomString($length = 10)

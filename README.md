@@ -89,4 +89,4 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 ## License
 
-GPLv3
+Apache 2.0
