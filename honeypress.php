@@ -228,8 +228,12 @@ function log_logout($id){
     $user = get_user_by("ID", $id);
     if ($user){
         $userName = $user->user_login;
-        wp_delete_user($id);
-        log_action($token, $id, false, "Removed user $id ($userName)","usercleanup_logout");
+        
+        $notAllowed = getSetting("blockedLogins");
+        if (!in_array($userName, $notAllowed)){
+            wp_delete_user($id);
+            log_action($token, $id, false, "Removed user $id ($userName)","usercleanup_logout");
+        }
     } else {
         log_action($token, $id, false, "Attempted remove for $id, but was already gone","usercleanup_logout");
     }
