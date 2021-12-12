@@ -77,7 +77,7 @@ Place following `honeypress.json` in your WordPress root folder.
 |catchComments|Should comments be monitored|true|
 |watchFiles|Check the files for changes (slow operation)|true|
 
-Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly plugin is present". 
+Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly" plugin is present. 
 
 In case you give the default user role permission to access the plugin list, HoneyPress will try to mask itself behind Hello Dolly's description.
 
