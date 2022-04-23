@@ -32,7 +32,7 @@ HoneyPress can monitor following actions
 - `request` - A request was completed
 - `dashboard` - A user navigated in the admin dashboad
 - `usercleanup_timeout` - A user was removed (e. g. due session expire) by HoneyPress
-- `useradd` - A user was created by HoneyPress
+- `useradd`/ `user_create` - A user was created by HoneyPress
 - `usercleanup_logout`- A user was removed due to logout by HoneyPress
 - `comment` - A comment was done
 - `fileupload` - A file was uploaded out of the WordPress backend
