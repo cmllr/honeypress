@@ -143,9 +143,16 @@ function get_ip()
   return $ip;
 }
 
-function get_hash($filename){
-  return hash_file("CRC32", $filename, false);
+/**
+ * Return a global identifier for a file, consisting out of the modify time, a path hash (sha1) and a CRC32 checksum of the file
+ */
+function get_file_id($filename){
+  $mtime = filemtime($filename);
+  $pathHash = sha1($filename);
+  $hash = hash_file("CRC32", $filename, false);
+  return $mtime.$pathHash.$hash;
 }
+
 /* https://stackoverflow.com/questions/24783862/list-all-the-files-and-folders-in-a-directory-with-php-recursive-function */
 function getDirContents($dir, &$results = array()) {
   $files = scandir($dir);
@@ -154,7 +161,7 @@ function getDirContents($dir, &$results = array()) {
       $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
       if (!is_dir($path)) {
         if (strpos($path, "honeypress") === false && strpos($path, "uploads") == false){
-          $results[get_hash($path)] = $path;
+          $results[get_file_id($path)] = $path;
         }
       } else if ($value != "." && $value != "..") {
         if (strpos($path, "logs") === false){
@@ -171,6 +178,9 @@ function getDirContents($dir, &$results = array()) {
  */
 function is_blocked_user() {
 
+  if (!function_exists("wp_get_current_user")) {
+    return false;
+  }
   $user = wp_get_current_user();
   if (!$user){
     return true;

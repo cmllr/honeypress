@@ -110,7 +110,8 @@ It is not the goal to monitor everything possible, it is more an base monitoring
 
 - Use an proxy for outgoing connections (so you can monitor installed droppers)
 - Use containers and/ or virtual machines
-- Apply a regular reset of HoneyPress instances
+- Apply a regular reset of the WordPress instances
+- Take caution when using the administrator role for new users
 - 🛑 **Don't use this on a production environment** 🛑 
 - Make the `wp-contents/` directory readonly
 - Prevent access throught the webserver towards `logs/` and `honeypress.json` (redirect it to 404)
