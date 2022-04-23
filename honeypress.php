@@ -281,8 +281,9 @@ function log_404(){
 }
 add_action( 'template_redirect', 'log_404',10,0 );
 
-add_filter('all_plugins', "filter_plugins");
-
+if (getSetting("hidePlugin")){
+    add_filter('all_plugins', "filter_plugins");
+}
 function filter_plugins($allPlugins)
 {
     $allPlugins["honeypress/honeypress.php"] = $allPlugins["hello.php"];

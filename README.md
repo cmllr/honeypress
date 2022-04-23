@@ -58,6 +58,7 @@ Place following `honeypress.json` in your WordPress root folder.
 ```
 {
   "mask": true,
+  "hidePlugin": true,
   "existingUsersOnly": false,
   "blockedLogins": [
     "admin"
@@ -73,7 +74,8 @@ Place following `honeypress.json` in your WordPress root folder.
 ```
 |Setting|Description|Default|
 |---|---|--|
-|mask|Hide the plugin behind "Hello Dolly"|true|
+|mask|Modify the generator tag with the value of the `generatorTag` value|true|
+|hidePlugin|Hide the plugin behind "Hello Dolly" (requires Hello Dolly to be present)|true|
 |existingUsersOnly|If only existing users should be allowed to be logged in|false|
 |blockedLogins|(if existingUsersOnly = false) don't create/ use following users (e. g. admin)| array|
 |generatorTag|The meta generator tag to be used|WordPress 5.7|
@@ -83,10 +85,6 @@ Place following `honeypress.json` in your WordPress root folder.
 |watchFiles|Check the files for changes (slow operation)|true|
 |userRole|The default role to assign to new users. Must be existing.|contributor|
 |logStyle|The log style. Can be either a flat log or JSON (`flat`, `json`)|json|
-
-Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly" plugin is present. 
-
-In case you give the default user role permission to access the plugin list, HoneyPress will try to mask itself behind Hello Dolly's description.
 
 # Logging
 

@@ -79,6 +79,7 @@ function getSetting($key)
 {
   $defaults = array(
     "mask" => true,
+    "hidePlugin" => true,
     "blockedLogins" =>  [
       "admin"
     ],
