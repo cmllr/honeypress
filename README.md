@@ -12,9 +12,9 @@ The project heavily depends on WordPress hook and action, but can also monitor f
 
 ## Obvious Disclaimer
 
-🛑 **This project is a playground. Use with caution :)** 
-🛑 This honeypot _de facto_ introduces a Security issue on purpose to the WordPress. Use in isolated environments only
-🛑 The honeypot itself might contain security issues
+- 🛑 **This project is a playground. Use with caution :)** 
+- 🛑 This honeypot _de facto_ introduces a Security issue on purpose to the WordPress. Use in isolated environments only
+- 🛑 The honeypot itself might contain security issues
 
 ## Features
 
