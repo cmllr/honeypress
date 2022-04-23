@@ -117,6 +117,8 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 }
 ```
 
+**No** trailing , will be added to new entries. The log entries are not member of an array.
+
 ## Limitations
 
 - This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.
