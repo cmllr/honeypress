@@ -4,13 +4,13 @@ Plugin Name:  HoneyPress
 Plugin URI:   https://github.com/cmllr/honeypress.git
 Description:  High interaction honeypot for WordPress
 Version:      2
-Author:       Christoph Müller
+Author:       https://github.com/cmllr
 Author URI:   https://github.com/cmllr/honeypress.git
 License:      Apache 2.0
 */
 
 /*
-    Copyright 2021 Christoph Müller
+    Copyright 2021-2022 https://github.com/cmllr
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
