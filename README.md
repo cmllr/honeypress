@@ -10,7 +10,11 @@ The HoneyPress projects adds high interaction honeypot features to an existing W
 
 The project heavily depends on WordPress hook and action, but can also monitor file modifications inside the Wordpress files itself.
 
-🛑 **This project is a playground. Use with caution :)** 🛑 
+## Obvious Disclaimer
+
+🛑 **This project is a playground. Use with caution :)** 
+🛑 This honeypot _de facto_ introduces a Security issue on purpose to the WordPress. Use in isolated environments only
+🛑 The honeypot itself might contain security issues
 
 ## Features
 
