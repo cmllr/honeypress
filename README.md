@@ -6,9 +6,9 @@
   \_)   
 ```
 
-The goal is to monitor activities on the instance. These activities can be attempted logins, comment spam or in general requests towards the instance to drop scripts.
+The HoneyPress projects adds high interaction honeypot features to an existing WordPress instance. The project can be installed as a regular plugin and wiill monitor given actions on the WordPress instance. HoneyPress can allow users to be created or being used by a defined username and password list. Activities will be logged on the logs/ directory inside the WordPress directory.
 
-The Honeypot can utilize defined users and/ or create users on the fly (with a limited lifespan) and monitors the acitvity as JSON file. Activities will be logged on the logs/ directory inside the WordPress directory.
+The project heavily depends on WordPress hook and action, but can also monitor file modifications inside the Wordpress files itself.
 
 🛑 **This project is a playground. Use with caution :)** 🛑 
 
@@ -22,7 +22,7 @@ The Honeypot can utilize defined users and/ or create users on the fly (with a l
 - [x] FileSystem based logging
 - [X] Proper deletion of honeypot users
 - [x] Catching of file uploads inside WordPress
-- [x] Monitoring of given comments (spam)
+- [x] Monitoring of comments (spam)
 - [x] Log activity inside the WP dashboard
 
 ## Activities
@@ -49,7 +49,6 @@ Make sure not found files are being redirected to the index.php of the WordPress
 
 ### Setup plugin
 
-
 Place following `honeypress.json` in your WordPress root folder.
 
 ```
@@ -64,7 +63,8 @@ Place following `honeypress.json` in your WordPress root folder.
   "expireUser": 10,
   "catchComments": true,
   "watchFiles": true,
-  "userRole": "contributor"
+  "userRole": "contributor",
+  "logStyle": "json"
 }
 ```
 |Setting|Description|Default|
@@ -78,6 +78,7 @@ Place following `honeypress.json` in your WordPress root folder.
 |catchComments|Should comments be monitored|true|
 |watchFiles|Check the files for changes (slow operation)|true|
 |userRole|The default role to assign to new users. Must be existing.|contributor|
+|logStyle|The log style. Can be either a flat log or JSON (`flat`, `json`)|json|
 
 Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly" plugin is present. 
 
@@ -102,9 +103,15 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 ## Limitations
 
-This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.
+- This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.
 
-It is not the goal to monitor everything possible, it is more an base monitoring what is going on with some crawlers or botnets.
+- It is not the goal to monitor everything possible, it is more an base monitoring what is going on with some crawlers or botnets.
+
+- A modified file will trigger an `filedropdelete` event, followed by a `filedropnew` event.
+
+## Updating instances
+
+- When having `watchFiles` enabled, remove the `pre.json` file after the wordpress update. The initial state will be recreated (otherwise all files might be marked as modified)
 
 ## Recommendations
 
@@ -113,8 +120,8 @@ It is not the goal to monitor everything possible, it is more an base monitoring
 - Apply a regular reset of the WordPress instances
 - Take caution when using the administrator role for new users
 - 🛑 **Don't use this on a production environment** 🛑 
-- Make the `wp-contents/` directory readonly
 - Prevent access throught the webserver towards `logs/` and `honeypress.json` (redirect it to 404)
+- Implement a log rotation on `global.log`
 
 ## License
 

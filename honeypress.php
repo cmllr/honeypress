@@ -234,7 +234,17 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
 
     // log into global logfile
     if ($shortAction){
-        $logString = sprintf("[%s] [%s] [%s] %s\n",get_ip(), ($token ? $token : "No token"), $logSuffix, $shortAction);
+        $style = getSetting("logStyle");
+        if ($style !== "json") {
+            $logString = sprintf("[%s] [%s] [%s] %s\n",get_ip(), ($token ? $token : "No token"), $logSuffix, $shortAction);
+        } else {
+            $logString = json_encode([
+                "ip" => get_ip(),
+                "token" => ($token ? $token : "No token"),
+                "suffix" => $logSuffix,
+                "action" => $shortAction
+            ]);
+        }
         error_log($logString,3, ABSPATH."/logs/global.log");
     }
 }

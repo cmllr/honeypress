@@ -89,7 +89,8 @@ function getSetting($key)
     "expireUser" => 60,
     "catchComments" => true,
     "watchFiles" => true,
-    "userRole" => "contributor"
+    "userRole" => "contributor",
+    "logStyle" => "flat"
   );
 
   $configPath = ABSPATH . "/honeypress.json";
