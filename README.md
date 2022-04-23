@@ -97,10 +97,24 @@ logs/<token>/credentials.log (if the user logged in)
 logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logout|fileupload|comment|filedropnew|filedropdelete>.log (Activity)
 ```
 
+## Log format
+
 `global.log` uses following structure:
 
+### `flat` style
 ```
-[IP] [token or "No token"] [request|dashboard|usercleanup|useradd|usercleanup_logout|fileupload|comment|filedropnew|filedropdelete] logmessage
+[IP] [token or "No token"] ["See activities section of this readme"] logmessage
+```
+
+### `json` style
+
+```
+{
+  "ip": "ip",
+  "token": "token",
+  "suffix": "See activities section of this readme",
+  "action":  logmessage
+}
 ```
 
 ## Limitations
