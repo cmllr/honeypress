@@ -33,7 +33,7 @@ function create_log_folder($id, $credentials)
   $data["credentials"] = $credentials;
   $userName = $credentials["credentials"]["user"];
   $password = $credentials["credentials"]["password"];
-  log_action($id, $data, false, "Created user $userName ($password)", "useradd");
+  log_action($id, $data, false, "Created session folder $id ($userName:$password)", "session_create");
 }
 
 function generateRandomString($length = 10)
@@ -88,7 +88,8 @@ function getSetting($key)
     "allowUploads" => true,
     "expireUser" => 60,
     "catchComments" => true,
-    "watchFiles" => true
+    "watchFiles" => true,
+    "userRole" => "contributor"
   );
 
   $configPath = ABSPATH . "/honeypress.json";
@@ -163,4 +164,19 @@ function getDirContents($dir, &$results = array()) {
   }
 
   return $results;
+}
+
+/**
+ *  Checks if the current user is a blocked user, e. g. preventing logs and deletion
+ */
+function is_blocked_user() {
+
+  $user = wp_get_current_user();
+  if (!$user){
+    return true;
+  }
+
+  $name = $user->user_login;
+  $blockedLogins = getSetting("blockedLogins");
+  return in_array($name, $blockedLogins);
 }

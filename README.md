@@ -31,7 +31,7 @@ HoneyPress can monitor following actions
 
 - `request` - A request was completed
 - `dashboard` - A user navigated in the admin dashboad
-- `usercleanup` - A user was removed (e. g. due session expire) by HoneyPress
+- `usercleanup_timeout` - A user was removed (e. g. due session expire) by HoneyPress
 - `useradd` - A user was created by HoneyPress
 - `usercleanup_logout`- A user was removed due to logout by HoneyPress
 - `comment` - A comment was done
@@ -63,7 +63,8 @@ Place following `honeypress.json` in your WordPress root folder.
   "allowUploads": true,
   "expireUser": 10,
   "catchComments": true,
-  "watchFiles": true
+  "watchFiles": true,
+  "userRole": "contributor"
 }
 ```
 |Setting|Description|Default|
@@ -76,6 +77,7 @@ Place following `honeypress.json` in your WordPress root folder.
 |expireUser|(if existingUsersOnly = false) delete the user `n` seconds after login|60|
 |catchComments|Should comments be monitored|true|
 |watchFiles|Check the files for changes (slow operation)|true|
+|userRole|The default role to assign to new users. Must be existing.|contributor|
 
 Install the HoneyPress plugin into WordPress. Make sure the "Hello Dolly" plugin is present. 
 

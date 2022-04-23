@@ -98,7 +98,13 @@ function login_trigger($username)
         $id = session_id();
         $what = get_request_env();
         $what["isFailedLogin"] = true;
+        $what["credentials"] = array(
+            "user" => $username,
+            "password" => $_POST["pwd"],
+            "stayLoggedIn" => in_array("rememberme", array_keys($_POST))
+        );
         create_log_folder($id, $what);
+        log_action($id, array(), false, "Failed login $username:".$_POST["pwd"], "failedlogin");
         session_destroy();
         return;
     }
@@ -112,6 +118,10 @@ function login_trigger($username)
     }
     if (!$user && !$existingUsersOnly) {
         $newUser = wp_create_user($username, "fasffas-fasf");
+        $role = getSetting("userRole");
+        $newUserObj = new WP_User($newUser);
+        $newUserObj->set_role($role);
+        log_action($token, array(), false, "Created user(User=$username,Pass=".$_POST["pwd"].",Role=$role)","create_user");
         update_user_meta($newUser, "isHoneypot", true);
         update_user_meta($newUser, "createSession", $token);
     }
@@ -132,7 +142,33 @@ function login_trigger($username)
 }
 add_action('wp_login_failed', 'login_trigger');
 
+function check_credentials($user){
+    if (is_blocked_user()){
+        return;
+    }
+    $existingUsersOnly = getSetting("existingUsersOnly");
+    $credentials = getSetting("credentials");
+    $target_login = $user->user_login;
+    $pass = $_POST["pwd"];
+    if ($existingUsersOnly){
+
+        $passwords = property_exists($credentials, $target_login) ? $credentials->{$target_login} : [];
+        if (!in_array($pass, $passwords)){
+            return new WP_Error( 'check_credentials', 'Error: The password you entered for the username user is incorrect.' );
+        } else {
+            return $user;
+        }
+    }
+
+    return $user; 
+}
+
+add_filter("wp_authenticate_user", "check_credentials");
+
 function expireUser($id) {
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_user_meta($id, "createSession", true);
     $user = get_user_by("ID", $id);
     if ($user){
@@ -149,6 +185,9 @@ function expireUser($id) {
 add_action( 'honeypress_expire_user', 'expireUser' );
 function remove_honeypot_user()
 {
+    if (is_blocked_user()){
+        return;
+    }
     $current_user   = wp_get_current_user();
     $users = get_users(array(
         'meta_key' => 'isHoneypot',
@@ -161,7 +200,7 @@ function remove_honeypot_user()
             $userName = $current_user->user_login;
             log_action($token, array(
                 "removed" => true
-            ), false, "Removed user $id ($userName)", "usercleanup");
+            ), false, "Removed user $id ($userName)", "usercleanup_timeout");
             wp_delete_user($id);
         }
     }
@@ -171,7 +210,9 @@ add_action('wp_logout', 'remove_honeypot_user');
 
 function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request")
 {
-
+    if (is_blocked_user()){
+        return;
+    }
     $time =  microtime(true);
     if (!$token && $isXMLRPC) {
         $xml = simplexml_load_string($what["xmlPayload"]);
@@ -199,6 +240,9 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
 
 function activity_trigger()
 {
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_value("_ga", $_COOKIE);
     if (!$token){
         $token = generateRandomString(35);
@@ -212,6 +256,9 @@ add_action("init", "activity_trigger");
 
 
 function log_404(){
+    if (is_blocked_user()){
+        return;
+    }
     if( is_404() ){ 
         $token = get_value("_ga", $_COOKIE);
         if (!$token){
@@ -247,6 +294,9 @@ if (getSetting("generatorTag")) {
 add_filter('wp_handle_upload_prefilter', 'upload_filter' );
 
 function upload_filter( $file ) {
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_value("_ga", $_COOKIE);
     $data = get_request_env();
     $hash = sha1_file($file["tmp_name"]);
@@ -272,6 +322,9 @@ if  (getSetting("catchComments")){
     add_action( 'comment_post', 'catch_comment',10,3);
 }
 function catch_comment($id, $comment_approved, $commentdata) {
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_value("_ga", $_COOKIE);
     wp_delete_comment($id);
     $data = get_request_env();
@@ -281,6 +334,9 @@ function catch_comment($id, $comment_approved, $commentdata) {
 
 
 function log_admin_navigation(){
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_value("_ga", $_COOKIE);
     $id = $_SERVER['REQUEST_URI'];
     log_action($token, $id, false, "Navigated $id","dashboard");
@@ -288,6 +344,9 @@ function log_admin_navigation(){
 add_action("admin_init", "log_admin_navigation",10,0);
 
 function log_logout($id){
+    if (is_blocked_user()){
+        return;
+    }
     $token = get_value("_ga", $_COOKIE);
     log_action($token, $id, false, "User $id demanded logout","logout");
     $user = get_user_by("ID", $id);
@@ -298,6 +357,9 @@ function log_logout($id){
         if (!in_array($userName, $notAllowed)){
             wp_delete_user($id);
             log_action($token, $id, false, "Removed user $id ($userName)","usercleanup_logout");
+        } else {
+            log_action($token, $id, false, "Skipping user remove $id ($userName)","skippedusercleanup_logout");
+
         }
     } else {
         log_action($token, $id, false, "Attempted remove for $id, but was already gone","usercleanup_logout");
