@@ -6,5 +6,3 @@ for container in $CONTAINERS
 do
   ./report.sh $container > takeouts/$container.log
 done
-
-./cleanup.sh

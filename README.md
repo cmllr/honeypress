@@ -121,13 +121,15 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 ## Docker deployment (draft)
 
+> To use this, make sure you have docker, docker-compose ready.
+
 To deploy the instances, make sure you have an `honeypress:latest` image present. You can build it with the provided `Dockerfile`.
 
-To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs).
+To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout.
 
 To persist the results, you can use `takeout.sh`. The results will be stored in takeouts/. The takeout consists out of <id>.log and a folder <id>, containing uploads done by attackers.
 
-To remove all containers and volumes, you can use `cleanup.sh`
+To remove all containers and volumes, you can use `cleanup.sh`. The logs will persist.
 
 ## Limitations
 
