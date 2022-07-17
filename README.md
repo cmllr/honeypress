@@ -125,7 +125,12 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 To deploy the instances, make sure you have an `honeypress:latest` image present. You can build it with the provided `Dockerfile`.
 
-To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout.
+To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout. The deployment is done via docker compose, in case you need to adapt some settings. The WP instances will be configured to use localhost:<randomport> as the URL. In case you need to change this, you can use following commands:
+
+```
+docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set siteurl https://yourdomain"
+docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set home https://lyourdomain"
+```
 
 To persist the results, you can use `takeout.sh`. The results will be stored in takeouts/. The takeout consists out of <id>.log and a folder <id>, containing uploads done by attackers.
 
