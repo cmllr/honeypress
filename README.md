@@ -129,7 +129,7 @@ To create an instance, you can use the `deploy.sh` script. The script will creat
 
 ```
 docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set siteurl https://yourdomain"
-docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set home https://lyourdomain"
+docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set home https://yourdomain"
 ```
 
 To persist the results, you can use `takeout.sh`. The results will be stored in takeouts/. The takeout consists out of <id>.log and a folder <id>, containing uploads done by attackers.
