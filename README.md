@@ -119,6 +119,16 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 **No** trailing , will be added to new entries. The log entries are not member of an array.
 
+## Docker deployment (draft)
+
+To deploy the instances, make sure you have an `honeypress:latest` image present. You can build it with the provided `Dockerfile`.
+
+To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs).
+
+To persist the results, you can use `takeout.sh`. The results will be stored in takeouts/. The takeout consists out of <id>.log and a folder <id>, containing uploads done by attackers.
+
+To remove all containers and volumes, you can use `cleanup.sh`
+
 ## Limitations
 
 - This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.

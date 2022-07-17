@@ -1,0 +1,35 @@
+version: '3.1'
+# WP Credentials
+services:
+
+  honeypress_wordpress:
+    image: honeypress
+    restart: always
+    container_name: honeypress_wordpress
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: honeypress_db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: Vpwytm9VW6necXiM1o1z
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress:/var/www/html
+      - logs:/var/www/html/logs
+
+  honeypress_db:
+    container_name: honeypress_db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: Vpwytm9VW6necXiM1o1z
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  logs:
+  wordpress:
+  db:

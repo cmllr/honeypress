@@ -1,0 +1,18 @@
+{
+  "mask": false,
+  "hidePlugin": true,
+  "existingUsersOnly": false,
+  "blockedLogins": [
+    "admin"
+  ],
+  "credentials": {
+    "user": ["foobar"]
+  },
+  "generatorTag": "WordPress 5.721",
+  "allowUploads": true,
+  "expireUser": 100000,
+  "catchComments": true,
+  "userRole": "administrator",
+  "watchFiles": true,
+  "logStyle": "json"
+}
