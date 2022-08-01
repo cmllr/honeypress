@@ -28,11 +28,17 @@ docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root co
 docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set siteurl http://localhost:$PORT"
 docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set home http://localhost:$PORT"
 docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root plugin activate honeypress"
+docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root post delete 1"
 # fix permissions
 docker exec "honeypress_wordpress_$ID" bash -c "chown -R www-data:www-data ./logs"
 docker exec "honeypress_wordpress_$ID" bash -c "chown -R www-data:www-data ./wp-content"
 docker exec "honeypress_wordpress_$ID" bash -c "sed -i 's/\"admin\"/\"$WP_ADMIN_USER\"/g' ./honeypress.json" # make sure the admin is not deleted
 
+echo "Adding content, please wait"
 
+./generators/corporatelorem.sh $ID 5
+./generators/devlorem.sh $ID 5
+./generators/theme.sh $ID
+./generators/blogname.sh $ID
 
 echo "Created instance $ID. Port $PORT. Credentials: $WP_ADMIN_USER and $WP_ADMIN_PASS"

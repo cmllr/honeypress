@@ -136,6 +136,14 @@ To persist the results, you can use `takeout.sh`. The results will be stored in 
 
 To remove all containers and volumes, you can use `cleanup.sh`. The logs will persist.
 
+## Content sources
+
+
+- names.txt: Blog owner names to use (https://www.usna.edu/Users/cs/roche/courses/s15si335/proj1/files.php%3Ff=names.txt.html)
+- themes.txt: Blog themes to use
+- taglines: Blog descriptions to use.
+- On deployment, there will be some posts created using (corporatelorem.sh and devlorem.sh, but you can add others, of course)
+
 ## Limitations
 
 - This honeypot utilizes hooks and filters offered by WordPress. It is clear that only a subset ov available events can be monitored.

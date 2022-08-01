@@ -47,6 +47,12 @@ do
           echo "File dropped: $FILE_DROP_NAME"
         fi
 
+        if [[ $request =~ "delete" ]]; then
+          FILE_DROP_LOGFILE_PATH=$(echo $request | sed 's/.$//g')
+          FILE_DROP_NAME=$(docker exec -it "honeypress_wordpress_$1" cat  $RAW_PATH/$FILE_DROP_LOGFILE_PATH)
+          echo "File dropped: $FILE_DROP_NAME"
+        fi
+
 
 
         if [[ $request =~ "dashboard" ]]; then
