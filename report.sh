@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SESSIONS=$(docker exec -it "honeypress_wordpress_$1" bash -c "find logs -maxdepth 1 -type d | tail -n +2 | sed s/logs//g | sed s/^.//g | sed s/\$//g")
+SESSIONS=$(docker exec -it "honeypress_wordpress_$1" bash -c "ls -ltd logs/* | grep 'dr' | grep -o -E 'logs.*' | sed 's/logs\///g'")
 
 for session in $SESSIONS
 do
@@ -15,8 +15,6 @@ do
       if [ ! -z "$REQUEST_TIME" ]
       then
         REQUEST_TIME_SECONDS=$(expr $REQUEST_TIME / 1000)
-        DATE_TIME=$(date +'%Y-%m-%d %H:%M:%S' -d "@$REQUEST_TIME_SECONDS")
-        echo "Datetime: $DATE_TIME" 
         echo "Logfile: $request"
         if [[ $request =~ "request" ]]; then
           REQUEST_LOGFILE_PATH=$(echo $RAW_PATH/$request | sed 's/.$//g' )
