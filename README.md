@@ -156,6 +156,10 @@ To remove all containers and volumes, you can use `cleanup.sh`. The logs will pe
 
 - When having `watchFiles` enabled, remove the `pre.json` file after the wordpress update. The initial state will be recreated (otherwise all files might be marked as modified)
 
+## Mac remarks
+
+- Install `gnu-sed` and `coreutils` using `brew`
+
 ## Recommendations
 
 - Use an proxy for outgoing connections (so you can monitor installed droppers)
