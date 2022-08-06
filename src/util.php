@@ -20,7 +20,7 @@ function create_log_folder($id, $credentials)
   if (!$id) {
     return; /* no empty id folders */
   }
-  $rootFolder = ABSPATH . "/logs";
+  $rootFolder = ABSPATH . "logs";
 
   if (!is_dir($rootFolder)) {
     mkdir($rootFolder);

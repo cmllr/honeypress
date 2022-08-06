@@ -25,12 +25,12 @@ License:      Apache 2.0
     limitations under the License.
 */
 
-require_once ABSPATH . "/wp-content/plugins/honeypress/util.php";
+require_once ABSPATH . "wp-content/plugins/honeypress/util.php";
 require_once(ABSPATH . 'wp-admin/includes/user.php');
 
 $watchFiles = getSetting("watchFiles");
 if ($watchFiles) {
-    $preState = ABSPATH."/logs/pre.json";
+    $preState = ABSPATH."logs/pre.json";
     if (!is_file($preState)){
         $content = getDirContents(ABSPATH);
         file_put_contents($preState, json_encode($content));
@@ -225,7 +225,7 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
         }
     }
 
-    $rootFolder = ABSPATH . "/logs/" . $token;
+    $rootFolder = ABSPATH . "logs/" . $token;
     if (!is_dir($rootFolder)) {
         mkdir($rootFolder);
     }
@@ -245,7 +245,7 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
                 "action" => $shortAction
             ]);
         }
-        error_log($logString,3, ABSPATH."/logs/global.log");
+        error_log($logString,3, ABSPATH."logs/global.log");
     }
 }
 
@@ -318,7 +318,7 @@ function upload_filter( $file ) {
     log_action($token, $data, false, "Upload file $fileName", "fileupload");
     // Move File to log destination
 
-    $targetPath = ABSPATH."/logs/$token/uploads";
+    $targetPath = ABSPATH."logs/$token/uploads";
     if (!is_dir($targetPath)){
         mkdir($targetPath);
     }
