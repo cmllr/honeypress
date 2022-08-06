@@ -1,24 +1,49 @@
 #!/bin/bash
-DB_PASS=$(</dev/urandom tr -dc '12345!@#%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c25; echo "")
-ID=$(</dev/urandom tr -dc '123456789abcdefghijklmnopqrstuvwxyz' | head -c5; echo "")
-PORT=$(comm -23 <(seq 49152 65535 | sort) <(ss -Htan | awk '{print $4}' | cut -d':' -f2 | sort -u) | shuf | head -n 1)
-WP_ADMIN_USER=$(</dev/urandom tr -dc '12345wertQWERTasdfgASDFGzxcvbZXCVB' | head -c10; echo "")
-WP_ADMIN_PASS=$(</dev/urandom tr -dc '12345!@#%qwertQWERTasdfgASDFGzxcvbZXCVB' | head -c25; echo "")
+DB_PASS=$(openssl rand -base64 25 | md5 | head -c25;echo|xargs)
+ID=$(openssl rand -base64 5 | md5 | head -c5;echo|xargs)
+PLATFORM=$(uname)
+ARCH=$(arch)
+SED_COMMAND="sed"
+while getopts p: flag
+do
+    case "${flag}" in
+        p) PORT=${OPTARG};;
+    esac
+done
+
+if [[ $PLATFORM == *"Darwin"* ]]; then
+    SED_COMMAND="gsed"
+fi
+
+if [[ -z $PORT ]]; then
+    if [[ $PLATFORM == *"Darwin"* ]]; then
+        echo "Auto port choosing is not supported on mac"
+        exit 1
+    else
+        PORT=$(comm -23 <(seq 49152 65535 | sort) <(ss -Htan | awk '{print $4}' | cut -d':' -f2 | sort -u) | shuf | head -n 1)
+    fi
+fi
+
+WP_ADMIN_USER=$(openssl rand -base64 10 | md5 | head -c10;echo|xargs)
+WP_ADMIN_PASS=$(openssl rand -base64 10 | md5 | head -c10;echo|xargs)
 
 mkdir -p instances
 
 cat docker-compose.yml | sed "s/PASSWORD: Vpwytm9VW6necXiM1o1z/PASSWORD: \"$DB_PASS\"/g" > instances/$ID.yml
 
-sed -i "s/- wordpress:/- wordpress_$ID/g" instances/$ID.yml
-sed -i "s/- db:/- db_$ID:/g" instances/$ID.yml
-sed -i "s/  wordpress:/  wordpress_$ID:/g" instances/$ID.yml
-sed -i "s/  db:/  db_$ID:/g" instances/$ID.yml
-sed -i "s/logs:/logs_$ID:/g" instances/$ID.yml
-sed -i "s/WP Credentials/WP Credentials: localhost:$PORT $WP_ADMIN_USER $WP_ADMIN_PASS/g" instances/$ID.yml
-sed -i "s/honeypress_wordpress/honeypress_wordpress_$ID/g" instances/$ID.yml
-sed -i "s/honeypress_db/honeypress_db_$ID/g" instances/$ID.yml
-sed -i "s/- 8080:80/- $PORT:80/g" instances/$ID.yml
+$SED_COMMAND -i "s/- wordpress:/- wordpress_$ID/g" instances/$ID.yml
+$SED_COMMAND -i "s/- db:/- db_$ID:/g" instances/$ID.yml
+$SED_COMMAND -i "s/  wordpress:/  wordpress_$ID:/g" instances/$ID.yml
+$SED_COMMAND -i "s/  db:/  db_$ID:/g" instances/$ID.yml
+$SED_COMMAND -i "s/logs:/logs_$ID:/g" instances/$ID.yml
+$SED_COMMAND -i "s/WP Credentials/WP Credentials: localhost:$PORT $WP_ADMIN_USER $WP_ADMIN_PASS/g" instances/$ID.yml
+$SED_COMMAND -i "s/honeypress_wordpress/honeypress_wordpress_$ID/g" instances/$ID.yml
+$SED_COMMAND -i "s/honeypress_db/honeypress_db_$ID/g" instances/$ID.yml
+$SED_COMMAND -i "s/- 8080:80/- $PORT:80/g" instances/$ID.yml
 
+if [[ $ARCH == *"arm64"* ]]; then
+    $SED_COMMAND -i "s/mysql:5.7/arm64v8\/mysql:latest/g" instances/$ID.yml
+fi
 docker-compose -f instances/$ID.yml up -d
 
 sleep 10
@@ -36,9 +61,15 @@ docker exec "honeypress_wordpress_$ID" bash -c "sed -i 's/\"admin\"/\"$WP_ADMIN_
 
 echo "Adding content, please wait"
 
-./generators/corporatelorem.sh $ID 5
-./generators/devlorem.sh $ID 5
+# Add blog theme and names
 ./generators/theme.sh $ID
 ./generators/blogname.sh $ID
+
+docker exec "honeypress_wordpress_$ID" bash -c "mkdir /tmp/init"
+docker cp ./generators/corporatelorem.sh "honeypress_wordpress_$ID:/tmp/init/corporatelorem.sh"
+docker cp ./generators/devlorem.sh "honeypress_wordpress_$ID:/tmp/init/devlorem.sh"
+docker exec "honeypress_wordpress_$ID" bash -c "/tmp/init/corporatelorem.sh 5"
+docker exec "honeypress_wordpress_$ID" bash -c "/tmp/init/devlorem.sh 5"
+docker exec "honeypress_wordpress_$ID" bash -c "rm -rf /var/www/html/logs/*"
 
 echo "Created instance $ID. Port $PORT. Credentials: $WP_ADMIN_USER and $WP_ADMIN_PASS"
