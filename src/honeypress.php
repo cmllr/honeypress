@@ -215,6 +215,7 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
         return;
     }
     $time =  microtime(true);
+    $userAgent = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER["HTTP_USER_AGENT"] : null;
     if (!$token && $isXMLRPC) {
         $xml = simplexml_load_string($what["xmlPayload"]);
         $userName = (string)$xml->params->param[0]->value[0];
@@ -236,13 +237,14 @@ function log_action($token, $what, $isXMLRPC, $shortAction, $logSuffix="request"
     if ($shortAction){
         $style = getSetting("logStyle");
         if ($style !== "json") {
-            $logString = sprintf("[%s] [%s] [%s] %s\n",get_ip(), ($token ? $token : "No token"), $logSuffix, $shortAction);
+            $logString = sprintf("[%s] [%s] [%s] [%s] %s\n",get_ip(), ($token ? $token : "No token"), $logSuffix, $userAgent, $shortAction);
         } else {
             $logString = json_encode([
                 "ip" => get_ip(),
                 "token" => ($token ? $token : "No token"),
                 "suffix" => $logSuffix,
-                "action" => $shortAction
+                "action" => $shortAction,
+                "userAgent" => $userAgent
             ]);
         }
         error_log($logString,3, ABSPATH."logs/global.log");
