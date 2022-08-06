@@ -7,4 +7,3 @@ ADD logs/ /var/www/html/logs
 USER root
 RUN curl --output /wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chown -R www-data:www-data ./logs 
-RUN ls -la /var/www/html
