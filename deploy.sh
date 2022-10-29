@@ -8,6 +8,7 @@ IMAGE="honeypress:latest"
 DOCKERFILE_PATH="Dockerfile"
 REBUILD_IMAGE=false
 PUBLIC_URL="http://localhost"
+LABELS=""
 
 function show_help() {
     cat branding.txt
@@ -15,12 +16,13 @@ function show_help() {
     echo "deploy.sh -d <path>: Change the dockerfile path. Context will be still '.'. Default is 'Dockerfile'."
     echo "deploy.sh -u <url>: Set the public URL (homeurl/siteurl). The default is 'localhost:port'. If a value is provided, the port flag (-p and it's defualt) will be ignored."
     echo "deploy.sh -i <name:tag>: Change the used image name and tag. Default is 'honeypress:latest'"
+    echo "deploy.sh -l label1=value1,label2=value2: Add labels to the container. Use ',' to separate labels, avoid separator in labels. Defaults to nothing."
     echo "deploy.sh -p <number>: Change the port of the newly spawned instance"
     echo "deploy.sh -h: Show this message"
     exit 0
 }
 OPTIONS_PRESENT=false
-while getopts "d:i:p:u:hb" flag
+while getopts "d:i:l:p:u:hb" flag
 do
     OPTIONS_PRESENT=true
     case "${flag}" in
@@ -28,6 +30,7 @@ do
         d) DOCKERFILE_PATH=${OPTARG};;
         h) show_help;;
         i) IMAGE=${OPTARG};;
+        l) LABELS=${OPTARG};;
         p) PORT=${OPTARG};;
         u) PUBLIC_URL="${OPTARG}";;
     esac
@@ -87,6 +90,14 @@ mkdir -p instances
 
 cat docker-compose.yml | $SED_COMMAND "s/PASSWORD: Vpwytm9VW6necXiM1o1z/PASSWORD: \"$DB_PASS\"/g" > instances/$ID.yml
 
+if [ -z "$LABELS" ]
+then
+    $SED_COMMAND -i "s/.*LABELS//g" instances/$ID.yml
+else
+    echo "Adding labels to the container..."
+    $SED_COMMAND -i "s/LABELS/labels:\n      - $LABELS/g" instances/$ID.yml
+    $SED_COMMAND -i "s/,/\n      - /g" instances/$ID.yml
+fi
 $SED_COMMAND -i "s/IMAGE/$IMAGE/g" instances/$ID.yml
 $SED_COMMAND -i "s/- wordpress:/- wordpress_$ID/g" instances/$ID.yml
 $SED_COMMAND -i "s/- db:/- db_$ID:/g" instances/$ID.yml

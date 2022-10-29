@@ -8,6 +8,7 @@ services:
     container_name: honeypress_wordpress
     ports:
       - 8080:80
+    LABELS
     environment:
       WORDPRESS_DB_HOST: honeypress_db
       WORDPRESS_DB_USER: wordpress
