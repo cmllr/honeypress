@@ -155,6 +155,8 @@ To remove all containers and volumes, you can use `cleanup.sh`. The logs will pe
 
 ## Examples
 
+> For all command line parameters, see `deploy.sh -h` for details.
+
 ### Run an instance with a given port
 
 ```
