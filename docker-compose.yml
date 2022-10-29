@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   honeypress_wordpress:
-    image: honeypress
+    image: IMAGE
     restart: always
     container_name: honeypress_wordpress
     ports:

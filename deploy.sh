@@ -4,6 +4,8 @@ ID=$(openssl rand -base64 5 | md5 | head -c5;echo|xargs)
 PLATFORM=$(uname)
 ARCH=$(arch)
 SED_COMMAND="sed"
+IMAGE="honeypress:latest"
+DOCKERFILE_PATH="Dockerfile"
 while getopts p: flag
 do
     case "${flag}" in
@@ -17,11 +19,27 @@ fi
 
 if [[ -z $PORT ]]; then
     if [[ $PLATFORM == *"Darwin"* ]]; then
-        echo "Auto port choosing is not supported on mac"
+        echo "Auto port choosing is not supported on mac. See https://github.com/cmllr/honeypress/issues/5 for details"
         exit 1
     else
         PORT=$(comm -23 <(seq 49152 65535 | sort) <(ss -Htan | awk '{print $4}' | cut -d':' -f2 | sort -u) | shuf | head -n 1)
     fi
+fi
+
+# Check if the docker daemon is running at all.
+
+DOCKER_RUNNING=$(docker ps > /dev/null 2>&1)
+if [[ $? -ne 0 ]];
+then
+  echo "Is your Docker service running? Could not connect to the service."
+  exit 1
+fi
+
+# Check if the docker image exists, if not build $IMAGE from $DOCKERFILE_PATH
+if [[ "$(docker images -q $IMAGE 2> /dev/null)" == "" ]]; then
+  # do something
+  echo "The image $IMAGE is not present in the image list. Creating the image..."
+  docker build . -f $DOCKERFILE_PATH -t $IMAGE
 fi
 
 WP_ADMIN_USER=$(openssl rand -base64 10 | md5 | head -c10;echo|xargs)
@@ -31,6 +49,7 @@ mkdir -p instances
 
 cat docker-compose.yml | sed "s/PASSWORD: Vpwytm9VW6necXiM1o1z/PASSWORD: \"$DB_PASS\"/g" > instances/$ID.yml
 
+$SED_COMMAND -i "s/IMAGE/$IMAGE/g" instances/$ID.yml
 $SED_COMMAND -i "s/- wordpress:/- wordpress_$ID/g" instances/$ID.yml
 $SED_COMMAND -i "s/- db:/- db_$ID:/g" instances/$ID.yml
 $SED_COMMAND -i "s/  wordpress:/  wordpress_$ID:/g" instances/$ID.yml
