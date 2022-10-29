@@ -16,7 +16,7 @@ function show_help() {
     echo "deploy.sh -d <path>: Change the dockerfile path. Context will be still '.'. Default is 'Dockerfile'."
     echo "deploy.sh -u <url>: Set the public URL (homeurl/siteurl). The default is 'localhost:port'. If a value is provided, the port flag (-p and it's defualt) will be ignored."
     echo "deploy.sh -i <name:tag>: Change the used image name and tag. Default is 'honeypress:latest'"
-    echo "deploy.sh -l label1=value1,label2=value2: Add labels to the container. Use ',' to separate labels, avoid separator in labels. Defaults to nothing."
+    echo "deploy.sh -l label1=value1,label2=value2: Add labels to the honeypress container. Use ',' to separate labels, avoid separator in labels. Defaults to nothing."
     echo "deploy.sh -p <number>: Change the port of the newly spawned instance"
     echo "deploy.sh -h: Show this message"
     exit 0
