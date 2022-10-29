@@ -123,8 +123,6 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 > To use this, make sure you have docker, docker-compose ready.
 
-To deploy the instances, make sure you have an `honeypress:latest` image present. You can build it with the provided `Dockerfile`.
-
 To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout. The deployment is done via docker compose, in case you need to adapt some settings. The WP instances will be configured to use localhost:<randomport> as the URL. In case you need to change this, you can use following commands:
 
 ```
@@ -156,7 +154,7 @@ To remove all containers and volumes, you can use `cleanup.sh`. The logs will pe
 
 - When having `watchFiles` enabled, remove the `pre.json` file after the wordpress update. The initial state will be recreated (otherwise all files might be marked as modified)
 
-## Mac remarks
+## Mac remarks (for development)
 
 - Install `gnu-sed` and `coreutils` using `brew`
 
