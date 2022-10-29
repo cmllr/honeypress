@@ -119,16 +119,11 @@ logs/<token>/<timestamp><request|dashboard|usercleanup|useradd|usercleanup_logou
 
 **No** trailing , will be added to new entries. The log entries are not member of an array.
 
-## Docker deployment (draft)
+## Docker deployment
 
 > To use this, make sure you have docker, docker-compose ready.
 
-To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout. The deployment is done via docker compose, in case you need to adapt some settings. The WP instances will be configured to use localhost:<randomport> as the URL. In case you need to change this, you can use following commands:
-
-```
-docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set siteurl https://yourdomain"
-docker exec "honeypress_wordpress_$ID" bash -c "php /wp-cli.phar --allow-root option set home https://yourdomain"
-```
+To create an instance, you can use the `deploy.sh` script. The script will create an MySQL and WordPress container with three volumes (DB, WP, Logs). Credentials will be created on the fly, the WP admin user will be whitelisted and printed in stdout. The deployment is done via docker compose, in case you need to adapt some settings. The WP instances will be configured to use localhost:<randomport> as the URL unless you provide the option `-u https://yourpageurl.tld`. For other options, see `deploy.sh -h`
 
 To persist the results, you can use `takeout.sh`. The results will be stored in takeouts/. The takeout consists out of <id>.log and a folder <id>, containing uploads done by attackers.
 
