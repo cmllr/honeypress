@@ -153,6 +153,22 @@ To remove all containers and volumes, you can use `cleanup.sh`. The logs will pe
 
 - Install `gnu-sed` and `coreutils` using `brew`
 
+## Examples
+
+### Run an instance with a given port
+
+```
+deploy.sh -p 8181
+```
+
+### Run an instance with a given port (8555), an public URL (thisismypage.tld) and Traefik/ LetsEncrypt:
+
+```
+deploy.sh -p 8555 \
+          -u https://thisismypage.tld \
+          -l "traefik.enable=true,traefik.http.routers.thisismypage.rule=Host(\`thisismypage.tld\`),traefik.http.routers.thisismypage.entrypoints=websecure,traefik.http.routers.thisismypage.tls=true,traefik.http.routers.thisismypage.tls.certresolver=letsencrypt,traefik.docker.network=traefiknet,traefik.http.services.thisismypage.loadBalancer.server.port=8555"
+```
+
 ## Recommendations
 
 - Use an proxy for outgoing connections (so you can monitor installed droppers)
